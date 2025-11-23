@@ -1,56 +1,37 @@
-<content><![CDATA[<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Maldives Island Finder</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-tailwind.config = {
-theme: {
-extend: {
-colors: {
-teal: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 600: '#0d9488', 800: '#115e59', 900: '#134e4a' },
-sand: { 50: '#fdfbf7', 100: '#f7f3e8', 200: '#ece5d0', 800: '#5c5443' }
-},
-fontFamily: { sans: ['Inter', 'sans-serif'] }
-}
-}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Maldives Island Finder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              teal: { 50: '#f0fdfa', 100: '#ccfbf1', 500: '#14b8a6', 600: '#0d9488', 800: '#115e59', 900: '#134e4a' },
+              sand: { 50: '#fdfbf7', 100: '#f7f3e8', 200: '#ece5d0', 800: '#5c5443' }
+            },
+            fontFamily: { sans: ['Inter', 'sans-serif'] }
+          }
+        }
+      }
+    </script>
+    <style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'); body { background-color: #f7f3e8; }</style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0"
+  }
 }
 </script>
-<style>@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap'); body { background-color: #f7f3e8; }</style>
 </head>
-<body>
-<div id="root"></div>
-<script type="module" src="/src/index.tsx"></script>
-</body>
-</html>]]></content>
-package.json
-<content><![CDATA[{
-"name": "maldives-island-finder",
-"private": true,
-"version": "0.0.0",
-"type": "module",
-"scripts": {
-"dev": "vite",
-"build": "tsc && vite build",
-"preview": "vite preview"
-},
-"dependencies": {
-"@google/genai": "latest",
-"react": "^18.2.0",
-"react-dom": "^18.2.0"
-},
-"devDependencies": {
-"@types/react": "^18.2.66",
-"@types/react-dom": "^18.2.22",
-"@vitejs/plugin-react": "^4.2.1",
-"autoprefixer": "^10.4.19",
-"postcss": "^8.4.38",
-"tailwindcss": "^3.4.3",
-"typescript": "^5.2.2",
-"vite": "^5.2.0"
-}
-}]]></content>
-</change>
-</changes>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>
