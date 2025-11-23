@@ -433,8 +433,8 @@ const App: React.FC = () => {
                     {/* 5. Special Features */}
                     <FilterSection title="Special Features">
                     <div className="space-y-2">
-                        <FilterCheckbox label="Has Attached Sandbank" value="sandbank" checked={filters.hasSandbankAttached} onChange={(v, c) => handleBooleanFilterChange('hasSandbankAttached', c)} />
-                        <FilterCheckbox label="Floating Bar Nearby" value="floating" checked={filters.hasFloatingBar} onChange={(v, c) => handleBooleanFilterChange('hasFloatingBar', c)} />
+                        <FilterCheckbox label="Has Attached Sandbank" value="sandbank" checked={filters.hasSandbankAttached} onChange={(_, c) => handleBooleanFilterChange('hasSandbankAttached', c)} />
+                        <FilterCheckbox label="Floating Bar Nearby" value="floating" checked={filters.hasFloatingBar} onChange={(_, c) => handleBooleanFilterChange('hasFloatingBar', c)} />
                     </div>
                     </FilterSection>
 
