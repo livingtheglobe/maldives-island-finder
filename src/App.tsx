@@ -22,7 +22,6 @@ import {
   Nightlife 
 } from './types';
 
-// Helper to clear all filters
 const INITIAL_FILTERS: FilterState = {
   atolls: [],
   transferTypes: [],
@@ -45,10 +44,8 @@ const App: React.FC = () => {
   const [aiRecommendations, setAiRecommendations] = useState<AIRecommendation[]>([]);
   const [resetSignal, setResetSignal] = useState(0);
   
-  // State for Mobile Filter Toggle (Twist/Twirl)
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
-  // Generic Handler for Array-based filters
   const handleArrayFilterChange = <K extends keyof FilterState>(
     category: K,
     value: string,
@@ -63,7 +60,6 @@ const App: React.FC = () => {
     });
   };
 
-  // Handler for Boolean toggles
   const handleBooleanFilterChange = (key: 'hasSandbankAttached' | 'hasFloatingBar', checked: boolean) => {
     setFilters(prev => ({ ...prev, [key]: checked }));
   };
@@ -82,24 +78,19 @@ const App: React.FC = () => {
   const handleGlobalReset = () => {
     setFilters(INITIAL_FILTERS);
     handleClearAI();
-    // Increment signal to notify children (AIConsultant) to clear local state
     setResetSignal(prev => prev + 1);
   };
 
-  // --- Filtering Logic Core ---
   const isIslandMatch = (island: Island, currentFilters: FilterState, excludeCategory?: keyof FilterState) => {
-    // 1. AI Match (if active) - AI results are always strict constraints
     if (aiRecommendations.length > 0) {
       const isRecommended = aiRecommendations.some(rec => rec.islandId === island.id);
       if (!isRecommended) return false;
     }
 
-    // 2. Location
     if (excludeCategory !== 'atolls' && currentFilters.atolls.length > 0) {
       if (!currentFilters.atolls.includes(island.atoll)) return false;
     }
 
-    // 3. Logistics
     if (excludeCategory !== 'transferTypes' && currentFilters.transferTypes.length > 0) {
       if (!currentFilters.transferTypes.some(t => island.transferTypes.includes(t))) return false;
     }
@@ -108,7 +99,6 @@ const App: React.FC = () => {
        if (!currentFilters.ferryAccess.includes(island.ferryAccess)) return false;
     }
 
-    // 4. Island Profile
     if (excludeCategory !== 'islandSize' && currentFilters.islandSize.length > 0) {
       if (!currentFilters.islandSize.includes(island.size)) return false;
     }
@@ -121,7 +111,6 @@ const App: React.FC = () => {
       if (!currentFilters.jungle.includes(island.jungle)) return false;
     }
 
-    // 5. Beach & Water
     if (excludeCategory !== 'bikiniBeach' && currentFilters.bikiniBeach.length > 0) {
       if (!currentFilters.bikiniBeach.includes(island.bikiniBeach)) return false;
     }
@@ -134,9 +123,7 @@ const App: React.FC = () => {
       if (!currentFilters.marineActivities.some(act => island.marineActivities.includes(act))) return false;
     }
 
-    // 6. Accommodations & Lifestyle
     if (excludeCategory !== 'accommodations' && currentFilters.accommodations.length > 0) {
-      // AND logic: must have ALL selected amenities
       if (!currentFilters.accommodations.every(acc => island.accommodations.includes(acc))) return false;
     }
 
@@ -156,12 +143,8 @@ const App: React.FC = () => {
   };
 
   const filteredIslands = useMemo(() => {
-    // First get the matched islands
     const result = ISLANDS.filter(island => isIslandMatch(island, filters));
 
-    // SORTING LOGIC:
-    // If AI Recommendations are active, sort by order of relevance (index in aiRecommendations)
-    // Otherwise, maintain the default order from constants.ts (which is grouped by Atoll)
     if (aiRecommendations.length > 0) {
        return result.sort((a, b) => {
          const indexA = aiRecommendations.findIndex(r => r.islandId === a.id);
@@ -173,23 +156,23 @@ const App: React.FC = () => {
     return result;
   }, [filters, aiRecommendations]);
 
-  // --- Dynamic Availability Logic ---
   const availableOptions = useMemo(() => {
-    const result = {
-      atolls: new Set<string>(),
-      transferTypes: new Set<string>(),
-      ferryAccess: new Set<string>(),
-      islandSize: new Set<string>(),
-      atmosphere: new Set<string>(),
-      accommodations: new Set<string>(),
-      bikiniBeach: new Set<string>(),
-      watersports: new Set<string>(),
-      marineActivities: new Set<string>(),
-      jungle: new Set<string>(),
-      nightlife: new Set<string>(),
+    const result: Record<keyof FilterState, Set<string>> = {
+      atolls: new Set(),
+      transferTypes: new Set(),
+      ferryAccess: new Set(),
+      islandSize: new Set(),
+      atmosphere: new Set(),
+      accommodations: new Set(),
+      bikiniBeach: new Set(),
+      watersports: new Set(),
+      marineActivities: new Set(),
+      jungle: new Set(),
+      nightlife: new Set(),
+      hasSandbankAttached: new Set(),
+      hasFloatingBar: new Set()
     };
 
-    // Helper to populate sets
     const checkAvailability = (category: keyof FilterState, set: Set<string>, extractor: (i: Island) => string | string[]) => {
        const potentialIslands = ISLANDS.filter(i => isIslandMatch(i, filters, category));
        potentialIslands.forEach(i => {
@@ -216,29 +199,25 @@ const App: React.FC = () => {
 
 
   const activeFilterCount = Object.values(filters).flat().filter(Boolean).length;
-  // Calculate true active state including AI
   const hasActiveFiltersOrAI = activeFilterCount > 0 || aiRecommendations.length > 0;
   const totalActiveFilters = activeFilterCount - (filters.hasSandbankAttached ? 0 : 0) - (filters.hasFloatingBar ? 0 : 0) 
                              + (filters.hasSandbankAttached ? 1 : 0) + (filters.hasFloatingBar ? 1 : 0);
 
-  // Helper to render checkboxes conditionally (Hide if not available)
   const renderFilterGroup = (
       options: string[], 
-      category: keyof FilterState, 
-      labelFn: (val: string) => string = (v) => v
+      category: keyof FilterState
   ) => {
       return options.map(opt => {
-          // If option is not available AND not currently checked, hide it.
-          // We keep it if it IS checked so the user can uncheck it.
-          const isAvailable = (availableOptions[category] as Set<string>).has(opt);
-          const isChecked = (filters[category] as string[]).includes(opt);
+          const isAvailable = availableOptions[category].has(opt);
+          const categoryValues = filters[category] as string[];
+          const isChecked = categoryValues.includes(opt);
           
           if (!isAvailable && !isChecked) return null;
 
           return (
             <FilterCheckbox 
                 key={opt} 
-                label={labelFn(opt)} 
+                label={opt} 
                 value={opt} 
                 checked={isChecked} 
                 onChange={(v, c) => handleArrayFilterChange(category, v, c)}
@@ -260,11 +239,9 @@ const App: React.FC = () => {
         />
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sidebar Filters */}
           <aside className="w-full lg:w-80 flex-shrink-0">
             <div className="bg-white rounded-xl shadow-sm border border-stone-200 sticky top-24 max-h-[85vh] overflow-y-auto scrollbar-thin flex flex-col">
               
-              {/* Filter Header - Clickable Toggle on Mobile */}
               <div 
                 className="p-4 border-b border-stone-100 flex items-center justify-between bg-white sticky top-0 z-10 flex-shrink-0 cursor-pointer lg:cursor-auto select-none lg:select-text"
                 onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
@@ -276,7 +253,6 @@ const App: React.FC = () => {
                       {totalActiveFilters}
                     </span>
                   )}
-                  {/* Mobile Twist/Twirl Icon */}
                   <svg 
                     className={`w-4 h-4 text-gray-400 transition-transform duration-300 lg:hidden ${isMobileFiltersOpen ? 'rotate-180' : ''}`} 
                     fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -288,7 +264,7 @@ const App: React.FC = () => {
                 {hasActiveFiltersOrAI && (
                   <button 
                     onClick={(e) => {
-                        e.stopPropagation(); // Prevent closing the toggle on mobile
+                        e.stopPropagation(); 
                         handleGlobalReset();
                     }}
                     className="text-xs text-teal-600 hover:text-teal-700 font-medium px-2 py-1 bg-teal-50 rounded-md transition-colors"
@@ -298,9 +274,7 @@ const App: React.FC = () => {
                 )}
               </div>
               
-              {/* Filter Body - Hidden on Mobile unless open, Always visible on Desktop */}
               <div className={`${isMobileFiltersOpen ? 'block' : 'hidden'} lg:block`}>
-                {/* PROMO CARD */}
                 <div className="p-5 bg-amber-50 border-b border-amber-100 flex-shrink-0">
                     <div className="flex items-start gap-3">
                     <div className="bg-amber-100 p-2 rounded-lg text-amber-600">
@@ -326,14 +300,12 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="flex-1 overflow-y-auto">
-                    {/* 0. Atoll Filter */}
                     <FilterSection title="Atoll / Location">
                         <div className="space-y-2">
                             {renderFilterGroup(Object.values(Atoll), 'atolls')}
                         </div>
                     </FilterSection>
 
-                    {/* 1. Logistics */}
                     <FilterSection title="Transfer & Access">
                     <div>
                         <p className="text-xs font-semibold text-gray-500 mb-2">Speedboat from Malé</p>
@@ -361,7 +333,6 @@ const App: React.FC = () => {
                     </div>
                     </FilterSection>
 
-                    {/* 2. Island Character */}
                     <FilterSection title="Island Character">
                     <div className="space-y-4">
                         <div>
@@ -385,7 +356,6 @@ const App: React.FC = () => {
                     </div>
                     </FilterSection>
 
-                    {/* 3. Beach & Activities */}
                     <FilterSection title="Beach & Activities">
                     <div className="space-y-4">
                         <div>
@@ -409,7 +379,6 @@ const App: React.FC = () => {
                     </div>
                     </FilterSection>
 
-                    {/* 4. Accommodation & Lifestyle */}
                     <FilterSection title="Accommodation & Lifestyle">
                     <div className="space-y-4">
                         <div>
@@ -427,7 +396,6 @@ const App: React.FC = () => {
                     </div>
                     </FilterSection>
 
-                    {/* 5. Special Features */}
                     <FilterSection title="Special Features">
                     <div className="space-y-2">
                         <FilterCheckbox label="Has Attached Sandbank" value="sandbank" checked={filters.hasSandbankAttached} onChange={(v, c) => handleBooleanFilterChange('hasSandbankAttached', c)} />
@@ -440,12 +408,10 @@ const App: React.FC = () => {
             </div>
           </aside>
 
-          {/* Results Grid */}
           <div className="flex-1">
             <div className="mb-6 flex items-center justify-between bg-white p-4 rounded-xl border border-stone-200 shadow-sm">
                <div>
                  <h2 className="text-lg font-bold text-gray-800">
-                   {/* Custom Header Text Logic */}
                    {filteredIslands.length === ISLANDS.length && totalActiveFilters === 0 
                      ? `Choose from ${ISLANDS.length} local islands` 
                      : `${filteredIslands.length} ${filteredIslands.length === 1 ? 'Island' : 'Islands'} Found`}
