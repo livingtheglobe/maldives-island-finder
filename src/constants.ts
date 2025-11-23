@@ -32,18 +32,27 @@ export const ISLANDS: Island[] = [
     ferryAccess: FerryAccess.Direct,
     size: IslandSize.Medium,
     atmosphere: [Atmosphere.Lively],
-    accommodations: [Accommodation.AffordableLuxury, Accommodation.Pool, Accommodation.Spa],
+    accommodations: [
+      Accommodation.AffordableLuxury, 
+      Accommodation.Pool, 
+      Accommodation.Spa
+    ],
     bikiniBeach: BikiniBeach.Medium,
     watersports: Watersports.Extensive,
-    marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+    marineActivities: [
+      MarineActivity.NurseSharks,
+      MarineActivity.MantaRays,
+      MarineActivity.WhaleSharks,
+      MarineActivity.Turtles,
+      MarineActivity.Dolphins,
+      MarineActivity.SandbankTours
+    ],
     seasonalActivities: [],
     jungle: JungleVegetation.Minimal,
     nightlife: Nightlife.Lively,
     hasSandbankAttached: false,
     isSandbankSeasonal: false,
     hasFloatingBar: true
-  },
-  // ... (Keep the rest of your ISLANDS array exactly as it is, don't delete it!)
-  // Since I can't see the full content in edit mode, make sure you only delete the `const DEFAULT_COVER_IMAGE` line at the top.
-  // IF YOU COPY PASTE THIS BLOCK, MAKE SURE YOU INCLUDE ALL ISLANDS.
-  // EASIER WAY: Just edit the file and delete line 18.
+  }
+  // Add more islands below this line inside the array
+];
