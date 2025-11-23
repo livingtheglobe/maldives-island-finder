@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Island, MarineActivity, TransferType, FerryAccess } from '../types';
+import { Island, MarineActivity, FerryAccess } from '../types';
 
 interface IslandCardProps {
   island: Island;
@@ -69,7 +69,6 @@ export const IslandCard: React.FC<IslandCardProps> = ({ island, aiReason }) => {
         <div className="flex flex-wrap gap-1.5 mb-4">
           {island.transferTypes.map(t => {
              const isFlight = t.includes('Flight');
-             const isSpeedboat = t.includes('Speedboat');
              return (
                 <span 
                   key={t} 
