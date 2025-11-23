@@ -4,8 +4,12 @@
       "source": "/(.*)",
       "headers": [
         {
+          "key": "X-Frame-Options",
+          "value": "ALLOW-FROM https://maldivesonabudget.net"
+        },
+        {
           "key": "Content-Security-Policy",
-          "value": "frame-ancestors https://maldivesonabudget.net https://*.maldivesonabudget.net"
+          "value": "frame-ancestors https://maldivesonabudget.net"
         }
       ]
     }
