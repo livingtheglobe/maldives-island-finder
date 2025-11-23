@@ -2,19 +2,18 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { ISLANDS } from "../constants";
 import { AIRecommendation } from "../types";
 
+// Use Vite's import.meta.env
 const apiKey = import.meta.env.VITE_API_KEY;
-const ai = new GoogleGenAI({ apiKey: apiKey });
+const ai = new GoogleGenAI({ apiKey: apiKey || "dummy_key_to_prevent_crash" });
 
 export const getIslandRecommendations = async (userPrompt: string): Promise<AIRecommendation[]> => {
   if (!apiKey) {
-    console.error("API Key missing");
+    console.error("API Key missing. Make sure VITE_API_KEY is set in Vercel.");
     return [];
   }
 
-  // Create a detailed representation of the data for the model including new filter fields
   const dataContext = ISLANDS.map(island => {
     let crowdNuance = "";
-    // Explicitly mark these islands as spacious despite hotel count
     if (['dhigurah', 'dharavandhoo'].includes(island.id)) {
         crowdNuance = " (Note: Feels spacious and NOT crowded despite hotel count)";
     }
@@ -24,8 +23,8 @@ export const getIslandRecommendations = async (userPrompt: string): Promise<AIRe
         name: island.name,
         atoll: island.atoll,
         desc: island.description,
-        sizeDetails: island.dimensions, // Explicit dimensions for AI
-        hotelCount: island.guestHouseCount + crowdNuance, // Explicit hotel count + nuance for crowds/availability
+        sizeDetails: island.dimensions,
+        hotelCount: island.guestHouseCount + crowdNuance,
         features: [
             ...island.transferTypes, 
             island.size, 
