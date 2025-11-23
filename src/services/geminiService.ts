@@ -2,7 +2,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { ISLANDS } from "../constants";
 import { AIRecommendation } from "../types";
 
-const apiKey = process.env.API_KEY;
+const apiKey = import.meta.env.VITE_API_KEY;
 const ai = new GoogleGenAI({ apiKey: apiKey });
 
 export const getIslandRecommendations = async (userPrompt: string): Promise<AIRecommendation[]> => {
