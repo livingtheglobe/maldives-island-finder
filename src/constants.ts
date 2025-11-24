@@ -301,7 +301,7 @@ export const ISLANDS: Island[] = [
     videoUrl: 'https://youtu.be/nJDNic8OF9Y',
     dimensions: '1km x 0.225km',
     guestHouseCount: 45,
-    transferTypes: [TransferType.SpeedboatUnder1H],
+    transferTypes: [TransferType.Speedboat1To2H],
     ferryAccess: FerryAccess.Direct,
     size: IslandSize.Medium,
     atmosphere: [Atmosphere.Lively],
