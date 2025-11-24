@@ -753,4 +753,6 @@ export const ISLANDS: Island[] = [
     isSandbankSeasonal: false, 
     hasFloatingBar: false
   }
-];
+];]]></content>
+</change>
+</changes>
