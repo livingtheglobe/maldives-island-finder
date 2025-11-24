@@ -1,14 +1,14 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 import { ISLANDS } from "../constants";
 import { AIRecommendation } from "../types";
 
-const apiKey = process.env.API_KEY;
-const ai = new GoogleGenAI({ apiKey: apiKey });
+// @ts-ignore: Vite specific environment variable
+const apiKey = import.meta.env.VITE_API_KEY;
+const ai = new GoogleGenAI({ apiKey: apiKey || "dummy_key_to_prevent_crash" });
 
 export const getIslandRecommendations = async (userPrompt: string): Promise<AIRecommendation[]> => {
   if (!apiKey) {
-    console.error("API Key missing");
+    console.error("API Key missing. Make sure VITE_API_KEY is set in Vercel Settings.");
     return [];
   }
 
@@ -48,54 +48,53 @@ export const getIslandRecommendations = async (userPrompt: string): Promise<AIRe
     
     Based on the following database of local islands, select the best matches.
     
-    EXPERT PERSONA RULES (Apply these strictly):
+    *** CRITICAL COMPLIANCE PROTOCOL (HIGHEST PRIORITY) ***
+    You MUST adhere to the laws of the Maldives. 
+    
+    1. NUDITY & TOPLESS BAN (STRICT):
+       - Public nudity and topless sunbathing are ILLEGAL and punishable by law on ALL local islands.
+       - IF user asks for: "nude", "naked", "topless", "naturist", "no tan lines", "skinny dipping", or "clothing optional".
+       - ACTION: Return an EMPTY array [] immediately. 
+       - DO NOT suggest "Bikini Beaches" as an alternative. Stop completely.
+
+    2. ALCOHOL/PORK BAN:
+       - Alcohol is ILLEGAL on local islands (only allowed on floating bars/safari boats).
+       - Pork is ILLEGAL.
+       - IF user asks for "alcohol on the beach", "pork", "bars on the island" (unless referring to floating bars).
+       - ACTION: Return an EMPTY array [].
+
+    -------------------------------------------------------
+    
+    STRICT CONSTRAINTS:
+    1. RELEVANCE: Return ALL islands that are truly good matches. Do not artificially limit the count. If 10 islands fit the criteria well, return all 10.
+    2. SHORT REASONS: Keep the 'reason' extremely concise (Max 12 words).
+
+    EXPERT PERSONA RULES:
 
     1. FAMILIES / KIDS (Especially with Small Children):
-       - CRITICAL PRIORITY: Short transfer times (< 45 mins) to minimize travel fatigue for toddlers.
-       - PREFER: Quiet atmosphere, shallow/safe beaches, easy logistics.
-       - TOP RECOMMENDATIONS: 
-         * Gulhi (Only 30 mins, very calm shallow water, quiet - Perfect for toddlers).
-         * Himmafushi (Only 20 mins, very quiet, easiest access).
-         * Dhiffushi (45 mins, family amenities, calm lagoon).
-         * Fulidhoo (1 hr, stingrays on beach are magical for kids, very safe/quiet).
-       - SECONDARY (Great but further): Thoddoo (1.5h+ but amazing beach/farms), Thinadhoo (1.5h+ resort feel).
-       - AVOID / DOWNRANK: 
-         * Maafushi (Too crowded/urban).
-         * Thulusdhoo (Surf focus, strong currents).
-         * Fehendhoo (Too isolated/quiet, lack of family amenities/activities).
+       - CRITICAL PRIORITY: Short transfer times (< 45 mins).
+       - PREFER: Quiet atmosphere, shallow/safe beaches.
+       - TOP RECOMMENDATIONS: Gulhi, Himmafushi, Dhiffushi, Fulidhoo.
+       - AVOID: Maafushi (Crowded), Thulusdhoo (Surf), Fehendhoo (Isolated).
 
     2. SOLO TRAVELERS / SINGLES:
-       - PREFER: Lively/Social vibe, Islands with Floating Bars, Hostels, or high guest house counts.
+       - PREFER: Lively/Social vibe, Floating Bars, Hostels.
        - TOP RECOMMENDATIONS: Maafushi, Thulusdhoo, Ukulhas, Dhiffushi, Gulhi, Dhangethi.
 
     3. LONG BEACH / WALKING BEACH:
-       - User Keyword: "Long beach", "walk", "long stretch", "scenery".
-       - TOP RECOMMENDATIONS:
-         * Dhigurah (Longest island, sandbank tip).
-         * Feridhoo (Large island, long beach).
-         * Fehendhoo (Long and narrow, scenic).
-         * Thulusdhoo (Large island, long coastline).
-         * Thinadhoo (Resort-like beach).
-         * Ukulhas (Long bikini beach).
-         * Dharavandhoo (Large beach area).
+       - Keywords: "Long beach", "walk", "scenery".
+       - TOP RECOMMENDATIONS: Dhigurah, Feridhoo, Fehendhoo, Thulusdhoo, Thinadhoo, Ukulhas, Dharavandhoo.
     
-    CRITICAL SORTING INSTRUCTION: 
-    - Order the results by RELEVANCE to the specific user request. 
-    - Example: If user asks "closest island to airport", put the island with shortest transfer time FIRST.
-    - Example: If user asks "swim with whale sharks", put South Ari Atoll islands FIRST.
-    - SIZE LOGIC: If user asks for "smallest" or "largest" island, ignore the generic "Small/Medium/Large" labels. Instead, strictly sort using the "sizeDetails" (e.g., "300m x 300m") to provide the mathematically correct answer.
-    - CROWD/HOTEL LOGIC: If user asks for "fewest tourists", "quietest", or "less people", strictly sort by "hotelCount" (ascending), BUT respect any notes about "Spacious feel" (e.g. Dhigurah/Dharavandhoo) which means they are exceptions to the high hotel count rule. If user asks for "most hotels", "lively", or "most options", sort by "hotelCount" (descending).
-    
-    CRITICAL WRITING INSTRUCTION:
-    - The 'reason' MUST be relatable and explain WHY it is good for the specific user.
-    - Do NOT just list features like "Short flight, spacious". 
-    - DO say: "The short 20-minute boat ride is stress-free with toddlers" or "Kids will love seeing stingrays right on the beach".
+    SORTING:
+    - Order results by RELEVANCE to the request.
+    - For "smallest/largest", use 'sizeDetails' dimensions mathematically.
+    - For "quiet/crowds", use 'hotelCount' (Low = Quiet, High = Lively).
     
     Database:
     ${JSON.stringify(dataContext)}
     
-    Return a JSON array of objects with "islandId" and a short "reason" (max 15 words) explaining why it fits.
-    Only return islands that genuinely fit. If none fit well, return an empty array.
+    Return a JSON array of objects with "islandId" and a short "reason".
+    Return [] if no good matches found or query is irrelevant/illegal.
   `;
 
   try {
