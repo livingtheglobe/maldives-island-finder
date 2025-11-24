@@ -1,3 +1,4 @@
+
 import { 
   Island, 
   Atoll,
@@ -14,6 +15,7 @@ import {
 } from './types';
 
 // Recommended Image Dimension: 800x208 (Fixed Height Strip)
+const DEFAULT_COVER_IMAGE = 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/test4.jpg?v=1763708041';
 const MAAFUSHI_COVER_IMAGE = 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Maafushi.webp?v=1763807763';
 
 export const ISLANDS: Island[] = [
@@ -753,6 +755,4 @@ export const ISLANDS: Island[] = [
     isSandbankSeasonal: false, 
     hasFloatingBar: false
   }
-];]]></content>
-</change>
-</changes>
+];
