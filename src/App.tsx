@@ -172,6 +172,9 @@ const App: React.FC = () => {
   };
 
   const filteredIslands = useMemo(() => {
+    // STRICT: If search error exists, return empty list to ensure message visibility
+    if (searchError) return [];
+
     // First get the matched islands
     const result = ISLANDS.filter(island => isIslandMatch(island, filters));
 
@@ -187,7 +190,7 @@ const App: React.FC = () => {
     }
 
     return result;
-  }, [filters, aiRecommendations]);
+  }, [filters, aiRecommendations, searchError]);
 
   // --- Dynamic Availability Logic ---
   const availableOptions = useMemo(() => {
