@@ -1,100 +1,749 @@
-import React, { useState, useEffect } from 'react';
-
-interface AIConsultantProps {
-  onSearch: (prompt: string) => void;
-  isLoading: boolean;
-  onClear: () => void;
-  hasResults: boolean;
-  resetSignal: number; // Incrementing number to trigger a reset
+<![CDATA[import {
+Island,
+Atoll,
+TransferType,
+FerryAccess,
+IslandSize,
+Atmosphere,
+Accommodation,
+BikiniBeach,
+Watersports,
+MarineActivity,
+JungleVegetation,
+Nightlife
+} from './types';
+// Recommended Image Dimension: 800x208 (Fixed Height Strip)
+const MAAFUSHI_COVER_IMAGE = 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Maafushi.webp?v=1763807763';
+export const ISLANDS: Island[] = [
+// --- SOUTH MALÉ ATOLL ---
+{
+id: 'maafushi',
+name: 'Maafushi',
+atoll: Atoll.SouthMale,
+description: 'One of the most popular local islands just 30 minutes by speedboat from Malé or reachable by direct public ferry. Known for its lively atmosphere, tons of excursions, and wide range of accommodation, Maafushi has minimal greenery but offers endless activity. Watersports, boat tours, and beachfront cafes give it a social, energetic vibe. Most shark and manta tours still travel around 45 minutes to Vaavu Atoll, but you’ll find no shortage of options here. Ideal for people who want convenience, fun, and lots to do.',
+imageUrl: MAAFUSHI_COVER_IMAGE,
+videoUrl: 'https://youtu.be/yNbFQsAqBBI',
+travelGuideUrl: 'https://maldivesonabudget.net/products/maafushi-maldives-travel-guide',
+dimensions: '1.275 km x 0.26 km',
+guestHouseCount: 70,
+transferTypes: [TransferType.SpeedboatUnder1H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Lively],
+accommodations: [Accommodation.AffordableLuxury, Accommodation.Pool, Accommodation.Spa],
+bikiniBeach: BikiniBeach.Medium,
+watersports: Watersports.Extensive,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Lively,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: true
+},
+{
+id: 'guraidhoo',
+name: 'Guraidhoo',
+atoll: Atoll.SouthMale,
+description: 'Just 45 minutes by speedboat from Malé, Guraidhoo is a medium-sized local island that offers an authentic slice of island life. It’s also one of the few nearby islands you can reach by direct public ferry, which makes it a solid pick for budget travelers. While the island itself doesn’t have much greenery, it’s the closest local island for turtle snorkeling tours. For nurse sharks and manta rays, most excursions travel further out toward Vaavu Atoll, around 45 minutes by boat.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Guraidhoo.webp?v=1763807763',
+videoUrl: 'https://youtu.be/a5fAfYASF_c',
+dimensions: '700m x 500m',
+guestHouseCount: 13,
+transferTypes: [TransferType.SpeedboatUnder1H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Local],
+accommodations: [Accommodation.AffordableLuxury],
+bikiniBeach: BikiniBeach.Medium,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'gulhi',
+name: 'Gulhi',
+atoll: Atoll.SouthMale,
+description: 'This small, cheerful island is just 30 minutes from Malé by speedboat, with direct public ferry access for budget travelers too. It’s known for its turquoise lagoon and that picture-perfect beach swing that pops up in everyone’s photos. While the island has a relaxed, social vibe, it’s never too crowded. For shark or manta excursions, most boats will take you about 45 minutes out toward Vaavu Atoll.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Gulhi.webp?v=1763807763',
+videoUrl: 'https://youtu.be/oDSbE6aQEBU',
+travelGuideUrl: 'https://maldivesonabudget.net/products/gulhi-maldives-travel-guide',
+dimensions: '400m x 225m',
+guestHouseCount: 14,
+transferTypes: [TransferType.SpeedboatUnder1H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Small,
+atmosphere: [Atmosphere.Lively],
+accommodations: [Accommodation.AffordableLuxury, Accommodation.Spa],
+bikiniBeach: BikiniBeach.Medium,
+watersports: Watersports.Moderate,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Moderate,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+// --- NORTH MALÉ ATOLL ---
+{
+id: 'thulusdhoo',
+name: 'Thulusdhoo',
+atoll: Atoll.NorthMale,
+description: 'The surfing capital of the Maldives, just 30 minutes by speedboat from Malé or accessible by direct public ferry. This large, action-packed island is a favorite among surfers and backpackers alike. While greenery is limited, the energy is high: great waves, lively guesthouses, stylish cafés, and a floating bar just offshore. Perfect for people who want a social vibe with an edge of adventure.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Thulusdhoo.webp?v=1763838452',
+videoUrl: 'https://youtu.be/GQcuPdVHmmQ',
+dimensions: '1.5km x 0.68km',
+guestHouseCount: 57,
+transferTypes: [TransferType.SpeedboatUnder1H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Large,
+atmosphere: [Atmosphere.Lively],
+accommodations: [Accommodation.AffordableLuxury, Accommodation.Pool, Accommodation.Spa],
+bikiniBeach: BikiniBeach.Large,
+watersports: Watersports.Moderate,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Moderate,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: true
+},
+{
+id: 'dhiffushi',
+name: 'Dhiffushi',
+atoll: Atoll.NorthMale,
+description: 'The easternmost local island in the Maldives, just 45 minutes by speedboat from Malé or reachable by direct public ferry. Dhiffushi is packed with activity: three separate bikini beaches, tons of watersports, and a moderate social vibe. There’s not much greenery, but the variety of guesthouses, beachfront cafes, and excursion options make it a fun and convenient choice for a short escape.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Diffushi.webp?v=1763807763',
+videoUrl: 'https://youtu.be/pxr-jvECmfM',
+dimensions: '900m x 200m',
+guestHouseCount: 42,
+transferTypes: [TransferType.SpeedboatUnder1H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Lively],
+accommodations: [Accommodation.AffordableLuxury],
+bikiniBeach: BikiniBeach.Large,
+watersports: Watersports.Extensive,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Lively,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'himmafushi',
+name: 'Himmafushi',
+atoll: Atoll.NorthMale,
+description: 'A quiet surf island just 20 minutes by speedboat from Malé Airport, also accessible by direct public ferry. This medium-sized island has a relaxed, low-key feel with minimal greenery and a strong local vibe. It’s especially popular with surfers, but even non-surfers love it for the uncrowded streets, easy-going pace, and a few guesthouses with surprisingly good food. Great pick if you’re looking for peace and simplicity without going far.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Himmafushi.webp?v=1763838453',
+videoUrl: 'https://youtu.be/ZviLqeQCNfk',
+dimensions: '900m x 750m',
+guestHouseCount: 28,
+transferTypes: [TransferType.SpeedboatUnder1H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet],
+accommodations: [Accommodation.AffordableLuxury],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+// --- VAAVU ATOLL ---
+{
+id: 'fulidhoo',
+name: 'Fulidhoo',
+atoll: Atoll.Vaavu,
+description: 'Just over an hour from Malé by speedboat (or hop on a direct public ferry), Fulidhoo is a peaceful, medium-sized island with an authentic local vibe. It’s the closest island to the famous Nurse Shark Point, and you’ll often spot friendly stingrays right on the beach. While the island has minimal greenery, a few hotels come with pools, adding a bit of comfort to your stay.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Fulidhoo.webp?v=1763807763',
+videoUrl: 'https://youtu.be/N_uZH6T_nZU',
+travelGuideUrl: 'https://maldivesonabudget.net/products/fulidhoo-maldives-travel-guide',
+dimensions: '700m x 200m',
+guestHouseCount: 27,
+transferTypes: [TransferType.SpeedboatUnder1H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [Accommodation.AffordableLuxury, Accommodation.Pool],
+bikiniBeach: BikiniBeach.Large,
+watersports: Watersports.Moderate,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'thinadhoo',
+name: 'Thinadhoo',
+atoll: Atoll.Vaavu,
+description: 'This small island feels like a hidden resort with none of the price tag. Reachable in about 1.5 hours by speedboat or direct public ferry, Thinadhoo offers a peaceful atmosphere, lush jungle trails, and one of the widest bikini beaches among local islands. You’ll also find a floating bar just offshore if you’re in the mood for a sunset drink.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/THinadhoo.webp?v=1763807763',
+videoUrl: 'https://youtu.be/u6KzFl-EnAM',
+travelGuideUrl: 'https://maldivesonabudget.net/products/thinadhoo-maldives-travel-guide',
+dimensions: '1.5km x 0.8km',
+guestHouseCount: 10,
+transferTypes: [TransferType.Speedboat1To2H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet],
+accommodations: [Accommodation.AffordableLuxury, Accommodation.Pool],
+bikiniBeach: BikiniBeach.Large,
+watersports: Watersports.Moderate,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Large,
+nightlife: Nightlife.Moderate,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: true
+},
+{
+id: 'felidhoo',
+name: 'Felidhoo',
+atoll: Atoll.Vaavu,
+description: 'The quiet capital of Vaavu Atoll, Felidhoo is a great choice if you’re craving total peace. It’s reachable by a 1 hour 45 minute speedboat or a direct public ferry. This island offers a truly local, non-touristy atmosphere with moderate greenery and hardly any crowds. A solid pick for travelers who just want to slow down and take it easy.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/felidhoo.webp?v=1763838453',
+dimensions: '700m x 200m',
+guestHouseCount: 9,
+transferTypes: [TransferType.Speedboat1To2H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Local],
+accommodations: [],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Medium,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'keyodhoo',
+name: 'Keyodhoo',
+atoll: Atoll.Vaavu,
+description: 'A small, authentic fishing island about 2 hours from Malé by speedboat or direct public ferry. It’s known for its excellent house reef just steps from shore. Keep in mind, dining options are limited, so it’s best to stay at a guesthouse that includes a meal plan. Quiet, local, and great for snorkeling lovers.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Keyodhoo.webp?v=1763809788',
+videoUrl: 'https://youtu.be/hohK5qkh88A',
+dimensions: '1.3km x 0.7km',
+guestHouseCount: 16,
+transferTypes: [TransferType.Speedboat1To2H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Local],
+accommodations: [],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+// --- NORTH ARI ATOLL (Alif Alif) ---
+{
+id: 'rasdhoo',
+name: 'Rasdhoo',
+atoll: Atoll.NorthAri,
+description: 'A compact island known for its excellent diving scene, with over 20 dive sites just minutes away. Only 1 hour by speedboat or accessible by direct public ferry from Malé. While greenery is minimal, Rasdhoo makes up for it with wellness-focused guesthouses, a convenient Bikini Beach, and seasonal manta ray snorkeling nearby. A solid pick if you’re here to dive or unwind.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Rasdhoo.webp?v=1763807762',
+videoUrl: 'https://youtu.be/6C3gneIoeIM',
+dimensions: '575m x 400m',
+guestHouseCount: 37,
+transferTypes: [TransferType.SpeedboatUnder1H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet],
+accommodations: [Accommodation.Spa],
+bikiniBeach: BikiniBeach.Medium,
+watersports: Watersports.Moderate,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Moderate,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'ukulhas',
+name: 'Ukulhas',
+atoll: Atoll.NorthAri,
+description: 'A clean and eco-conscious island, about 1 hour 15 minutes by speedboat or reachable via direct public ferry from Malé. It’s known for its long, sandy Bikini Beach, healthy house reef, and community-led sustainability efforts. The vibe is social but relaxed, and during certain months, manta ray snorkeling is available nearby. Great mix of nature, comfort, and local charm.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Ukulas.webp?v=1763807763',
+videoUrl: 'https://youtu.be/nJDNic8OF9Y',
+dimensions: '1km x 0.225km',
+guestHouseCount: 45,
+transferTypes: [TransferType.SpeedboatUnder1H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Lively],
+accommodations: [Accommodation.AffordableLuxury],
+bikiniBeach: BikiniBeach.Large,
+watersports: Watersports.Moderate,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Moderate,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'thoddoo',
+name: 'Thoddoo',
+atoll: Atoll.NorthAri,
+description: 'A large, green escape known for its watermelon farms and tropical vibe. Reachable by speedboat in about 1 hour 25 minutes from Malé. Public ferry access requires a transfer. Thoddoo stands out for its lush vegetation, wide bikini beach, and peaceful atmosphere. It’s also a solid pick for affordable luxury stays and offers seasonal Manta Ray snorkeling nearby. Great for couples and travelers who want a mix of nature and comfort.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Thoddhoo.webp?v=1763807763',
+videoUrl: 'https://www.youtube.com/watch?v=Evrsme0VMd8',
+travelGuideUrl: 'https://maldivesonabudget.net/products/thoddhoo-maldives-travel-guide',
+dimensions: '2km x 1km',
+guestHouseCount: 93,
+transferTypes: [TransferType.Speedboat1To2H],
+ferryAccess: FerryAccess.Transfer,
+size: IslandSize.Large,
+atmosphere: [Atmosphere.Lively],
+accommodations: [Accommodation.AffordableLuxury],
+bikiniBeach: BikiniBeach.Medium,
+watersports: Watersports.Moderate,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays],
+jungle: JungleVegetation.Large,
+nightlife: Nightlife.Moderate,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'bodufolhudhoo',
+name: 'Bodufolhudhoo',
+atoll: Atoll.NorthAri,
+description: 'A quiet, small island in North Ari Atoll, around 1.5 hours by speedboat from Malé. It’s known for its beachfront guesthouses, calm vibe, and seasonal manta ray snorkeling. Public ferry access is possible but requires a transfer at Ukulhas, which can add time to the journey. Perfect for those looking to disconnect in a peaceful setting with just the essentials.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Bodufolhudhoo.webp?v=1763807763',
+videoUrl: 'https://youtu.be/DsJ1x8zDfog',
+dimensions: '300m x 300m',
+guestHouseCount: 3,
+transferTypes: [TransferType.Speedboat1To2H],
+ferryAccess: FerryAccess.Transfer,
+size: IslandSize.Small,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'mathiveri',
+name: 'Mathiveri',
+atoll: Atoll.NorthAri,
+description: 'A peaceful, medium-sized island in North Ari Atoll, about 1.5 hours by speedboat from Malé. Public ferry access is available but requires a transfer at Ukulhas. Mathiveri is home to a gorgeous sandbank just offshore. You can walk to it at low tide or take a quick boat ride. It’s also a seasonal spot for manta snorkeling and has a relaxed, friendly local vibe that’s easy to fall in love with.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Mathiveri.webp?v=1763809813',
+videoUrl: 'https://youtu.be/pwqYbW3hMHc',
+dimensions: '0.775km x 0.475km',
+guestHouseCount: 28,
+transferTypes: [TransferType.Speedboat1To2H],
+ferryAccess: FerryAccess.Transfer,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [Accommodation.AffordableLuxury],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'feridhoo',
+name: 'Feridhoo',
+atoll: Atoll.NorthAri,
+description: 'A large, authentic island in North Ari Atoll, reachable by 1.5 to 2 hour speedboat. Public ferry access is available but requires a transfer at Ukulhas. Feridhoo is covered in lush tropical forest and feels peaceful even during high season. It’s a great base for tours to the North Ari nurse sharks and for whale shark and manta excursions heading toward South Ari.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Feridhoo.webp?v=1763838453',
+videoUrl: 'https://youtu.be/b6HW6sKqMl4',
+dimensions: 'Approx 1.3km long',
+guestHouseCount: 12,
+transferTypes: [TransferType.Speedboat1To2H],
+ferryAccess: FerryAccess.Transfer,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Local],
+accommodations: [],
+bikiniBeach: BikiniBeach.Large,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.NurseSharks, MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.HouseReef],
+seasonalActivities: [MarineActivity.MantaRays],
+jungle: JungleVegetation.Large,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'himandhoo',
+name: 'Himandhoo',
+atoll: Atoll.NorthAri,
+description: 'A small, traditional island in North Ari Atoll, reachable by speedboat in 1.5 to 2 hours. Public ferry access requires a transfer at Ukulhas. The island has a quiet, local vibe and minimal greenery. Some guesthouses organize full-day tours to South Ari, where you can snorkel with whale sharks and manta rays year-round.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Himandhoo.webp?v=1763838453',
+videoUrl: 'https://youtu.be/z3RP_wtPJ3c',
+dimensions: 'Approx 900m long',
+guestHouseCount: 11,
+transferTypes: [TransferType.Speedboat1To2H],
+ferryAccess: FerryAccess.Transfer,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+// --- SOUTH ARI ATOLL (Alif Dhaalu) ---
+{
+id: 'dhigurah',
+name: 'Dhigurah',
+atoll: Atoll.SouthAri,
+description: 'Nicknamed the “Long Island,” Dhigurah takes about 2 hours by speedboat from Malé, though it can take longer in rough weather. It’s also reachable by domestic flight to Maamigili Island, followed by a short speedboat ride. Public ferry access requires a transfer. The island is long, lush, and peaceful, with a quiet village and a reputation for being one of the top year-round whale shark spots in the Maldives. A seasonal sandbank connects to the island’s southern tip, perfect for sunset walks. Guesthouses tend to be on the higher end ($100+/night) but offer direct access to some of the best marine life tours in the country.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Dhigurah.webp?v=1763807762',
+videoUrl: 'https://youtu.be/b_-fU8CPVks',
+travelGuideUrl: 'https://maldivesonabudget.net/products/dhigurah-maldives-travel-guide',
+dimensions: '3km x 250m',
+guestHouseCount: 43,
+transferTypes: [TransferType.Speedboat1To2H, TransferType.DomesticFlightSpeedboat],
+ferryAccess: FerryAccess.Transfer,
+size: IslandSize.Large,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [Accommodation.AffordableLuxury],
+bikiniBeach: BikiniBeach.Large,
+watersports: Watersports.Moderate,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Dolphins],
+seasonalActivities: [],
+jungle: JungleVegetation.Large,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: true,
+isSandbankSeasonal: true,
+hasFloatingBar: false
+},
+{
+id: 'dhangethi',
+name: 'Dhangethi',
+atoll: Atoll.SouthAri,
+description: 'A medium-sized, authentic local island in South Ari Atoll, about 1 hour 45 minutes by speedboat from Malé. Public ferry access requires a transfer. Dhangethi has a grounded, non-touristy vibe with concrete roads and island-town energy, but still feels cozy. You’ll find overwater restaurants, decent dining variety, and direct access to year-round whale shark and manta tours, since this part of the Maldives is one of the best spots to see them.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Dhangeti.webp?v=1763838452',
+videoUrl: 'https://youtu.be/FtZjpqsp9VA',
+dimensions: '925m x 350m',
+guestHouseCount: 28,
+transferTypes: [TransferType.Speedboat1To2H, TransferType.DomesticFlightSpeedboat],
+ferryAccess: FerryAccess.Transfer,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Local],
+accommodations: [Accommodation.AffordableLuxury],
+bikiniBeach: BikiniBeach.Medium,
+watersports: Watersports.Moderate,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'mahibadhoo',
+name: 'Mahibadhoo',
+atoll: Atoll.SouthAri,
+description: 'The capital of South Ari Atoll, reachable in about 1 hour 25 minutes by speedboat. While not a typical tourist island, it’s one of the busiest local hubs, like a small island city. You’ll find paved roads, government offices, and lots of day-to-day activity, with locals from nearby islands often coming here for services. Public ferry access is available directly from Malé. It’s also a solid base for year-round whale shark and manta ray excursions in South Ari.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Mahibadhoo.webp?v=1763838452',
+videoUrl: 'https://youtu.be/DD7ehj7zFvs',
+dimensions: '2.4km x 1.2km',
+guestHouseCount: 11,
+transferTypes: [TransferType.Speedboat1To2H],
+ferryAccess: FerryAccess.Direct,
+size: IslandSize.Large,
+atmosphere: [Atmosphere.Local],
+accommodations: [],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'omadhoo',
+name: 'Omadhoo',
+atoll: Atoll.SouthAri,
+description: 'A small, peaceful island in South Ari Atoll, about 1 hour 30 minutes by speedboat from Malé. Public ferry access requires a transfer. While greenery is limited, Omadhoo is known for its relaxed, authentic local vibe and strong house reef just off the beach. It’s also a great base for year-round manta and whale shark excursions, thanks to its proximity to the best marine life spots in the Maldives.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Omadoo.webp?v=1763838452',
+videoUrl: 'https://youtu.be/CFmm2lQfbJ8',
+dimensions: '0.95km x 0.3km',
+guestHouseCount: 20,
+transferTypes: [TransferType.Speedboat1To2H],
+ferryAccess: FerryAccess.Transfer,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+// --- BAA ATOLL ---
+{
+id: 'dharavandhoo',
+name: 'Dharavandhoo',
+atoll: Atoll.Baa,
+description: 'The gateway to Hanifaru Bay, famous for seasonal gatherings of Manta Rays and Whale Sharks. Most visitors arrive by domestic flight from Malé (about 25 minutes), but speedboat transfers are also available, taking around 2 to 2.5 hours depending on sea conditions. There’s no direct public ferry from Malé, though inter-atoll ferries connect from nearby islands. Dharavandhoo is a small but lively island, with a few well-kept guesthouses and easy access to some of the best marine life encounters in Baa Atoll.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Dharavandhoo.webp?v=1763838452',
+videoUrl: 'https://youtu.be/OOhZ5cPLWUw',
+dimensions: '1.33km x 0.48km',
+guestHouseCount: 23,
+transferTypes: [TransferType.Speedboat2To3H, TransferType.DomesticFlight],
+ferryAccess: FerryAccess.None,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [Accommodation.AffordableLuxury, Accommodation.Pool, Accommodation.Spa],
+bikiniBeach: BikiniBeach.Large,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks],
+jungle: JungleVegetation.Medium,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: true
+},
+{
+id: 'dhonfanu',
+name: 'Dhonfanu',
+atoll: Atoll.Baa,
+description: 'A small, quiet island right next to Hanifaru Bay. Literally just a 2-minute speedboat ride away, making it the closest island to this world-famous marine protected area. Sometimes you’ll even spot manta rays right off the shore (though it’s not guaranteed). It’s often called the Turtle Island for a reason, you’re almost always guaranteed sightings while snorkeling. The island has minimal greenery, but offers a raw, local charm. While the popular floating bar is technically located near Dharavandhoo, you can still visit it easily from Dhonfanu for a small transfer fee. There’s currently only one guesthouse, and it specializes in diving trips, so if diving is on your list, this is a great base. Access is best via domestic flight to Dharavandhoo, followed by a short speedboat ride. No direct ferry from Malé.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Dhonfanu.webp?v=1763807763',
+videoUrl: 'https://youtu.be/WIgaPRyQ5z0',
+dimensions: '700m x 500m',
+guestHouseCount: 2,
+transferTypes: [TransferType.Speedboat2To3H, TransferType.DomesticFlightSpeedboat],
+ferryAccess: FerryAccess.None,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: true
+},
+{
+id: 'kendhoo',
+name: 'Kendhoo',
+atoll: Atoll.Baa,
+description: 'A small, peaceful island with historical significance and a strong local vibe. The easiest access is via domestic flight to Dharavandhoo, followed by a short speedboat transfer. A direct speedboat from Malé is possible but takes close to 3 hours and is often less convenient. Kendhoo sits among a beautiful chain of “gem” islands: small, lush islets that look stunning from the air. Located just 30 minutes from Hanifaru Bay, it offers seasonal access to Manta Rays and Whale Sharks, making it a great alternative to busier islands in Baa Atoll. Greenery is limited, but the laid-back atmosphere and untouched feel make it special.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Kendhoo.webp?v=1763807762',
+videoUrl: 'https://youtu.be/2cmRWUcgh4s',
+dimensions: '600m x 350m',
+guestHouseCount: 4,
+transferTypes: [TransferType.Speedboat2To3H, TransferType.DomesticFlightSpeedboat],
+ferryAccess: FerryAccess.None,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks],
+jungle: JungleVegetation.Minimal,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'kudarikilu',
+name: 'Kudarikilu',
+atoll: Atoll.Baa,
+description: 'A small, quiet island with a traditional feel and just a handful of guesthouses, so it never feels touristy. You can get here by speedboat from Malé (around 3 hours, depending on weather), but the faster and more reliable option is a domestic flight to Dharavandhoo, followed by a short speedboat ride. The island has medium greenery, a peaceful vibe, and seasonal snorkeling trips to see Mantas and Whale Sharks at nearby Hanifaru Bay. It’s also known for its heritage and traditional clay water pots, still made by locals today.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Kudariclu.webp?v=1763807763',
+videoUrl: 'https://youtu.be/qHrHi1RTP6s',
+dimensions: '600m x 300m',
+guestHouseCount: 2,
+transferTypes: [TransferType.Speedboat2To3H, TransferType.DomesticFlightSpeedboat],
+ferryAccess: FerryAccess.None,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [Accommodation.AffordableLuxury],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks],
+jungle: JungleVegetation.Medium,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'kamadhoo',
+name: 'Kamadhoo',
+atoll: Atoll.Baa,
+description: 'An underrated, medium-sized island that feels like a hidden sanctuary. You can get here by speedboat from Malé (about 2.5 to 3 hours, depending on sea conditions), or take a domestic flight to Dharavandhoo and hop on a short speedboat. Kamadhoo is known for its lush tropical greenery, charming local décor, and an inviting, peaceful vibe. It’s also home to yoga retreats and offers seasonal Manta and Whale Shark excursions nearby. A perfect blend of quiet nature and thoughtful island touches.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Kamadhoo.webp?v=1763807763',
+videoUrl: 'https://youtu.be/tjJtWHzx2Us',
+dimensions: '550m x 480m',
+guestHouseCount: 13,
+transferTypes: [TransferType.Speedboat2To3H, TransferType.DomesticFlightSpeedboat],
+ferryAccess: FerryAccess.None,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [Accommodation.AffordableLuxury, Accommodation.Pool],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks],
+jungle: JungleVegetation.Large,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'kihaadhoo',
+name: 'Kihaadhoo',
+atoll: Atoll.Baa,
+description: 'A small, authentic island with a truly local feel. You can reach it by speedboat from Malé (around 2.5 to 3 hours, depending on sea conditions) or more easily by taking a domestic flight to Dharavandhoo, followed by a short speedboat ride. The island is covered in a large tropical forest and has a calm, quiet vibe, ideal for disconnecting. There’s currently only one guesthouse, which makes the experience feel even more untouched and genuine. Great base for seasonal Manta and Whale Shark encounters in nearby waters.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Kihadhoo.webp?v=1763838452',
+videoUrl: 'https://youtu.be/XqMAT0cy_dY',
+dimensions: '840m x 490m',
+guestHouseCount: 2,
+transferTypes: [TransferType.Speedboat2To3H, TransferType.DomesticFlightSpeedboat],
+ferryAccess: FerryAccess.None,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks],
+jungle: JungleVegetation.Large,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'maalhos',
+name: 'Maalhos',
+atoll: Atoll.Baa,
+description: 'A medium-sized local island known for its clean streets and peaceful vibe. There are two islands named Maalhos in the Maldives, so make sure you’re looking at the one in Baa Atoll, not the one in North Ari! This one offers medium greenery, a few cozy guesthouses, and easy access to Hanifaru Bay for seasonal Manta and Whale Shark snorkeling. It’s a great choice for a quiet, comfortable retreat that still puts you close to adventure. There’s no direct ferry from Malé. You can reach it by a domestic flight to Dharavandhoo, followed by a short 15-min speedboat ride. By direct speedboat from Malé Airport, which takes around 2.5 depending on sea conditions.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Maalos.webp?v=1763807763',
+videoUrl: 'https://youtu.be/kdwlvF60Ip4',
+dimensions: '1km x 0.5km',
+guestHouseCount: 10,
+transferTypes: [TransferType.Speedboat2To3H, TransferType.DomesticFlightSpeedboat],
+ferryAccess: FerryAccess.None,
+size: IslandSize.Medium,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [],
+bikiniBeach: BikiniBeach.Small,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Turtles, MarineActivity.Dolphins, MarineActivity.HouseReef, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks],
+jungle: JungleVegetation.Medium,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: false,
+isSandbankSeasonal: false,
+hasFloatingBar: false
+},
+{
+id: 'fehendhoo',
+name: 'Fehendhoo',
+atoll: Atoll.Baa,
+description: 'It is a large, lush island that remains one of the Maldives’ best-kept secrets. With minimal guesthouses and hardly any tourists, it offers a peaceful, laid-back atmosphere perfect for travelers craving privacy. The attached sandbank is a highlight, walkable at low tide and ideal for lazy afternoons (but only available during dry season). You can get here by direct speedboat from Malé Airport (about 2 hours) or via a domestic flight to Dharavandhoo followed by a short boat ride. Thanks to its forested landscape, quiet village vibe, and lack of crowds, Fehendhoo is an underrated gem for those looking to truly unplug.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Fehendhoo.webp?v=1763807763',
+videoUrl: 'https://youtu.be/nTXceVmnGz4',
+dimensions: 'Long and narrow',
+guestHouseCount: 8,
+transferTypes: [TransferType.Speedboat1To2H, TransferType.DomesticFlightSpeedboat],
+ferryAccess: FerryAccess.None,
+size: IslandSize.Large,
+atmosphere: [Atmosphere.Quiet],
+accommodations: [Accommodation.AffordableLuxury],
+bikiniBeach: BikiniBeach.Medium,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Dolphins, MarineActivity.SandbankTours],
+seasonalActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks],
+jungle: JungleVegetation.Large,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: true,
+isSandbankSeasonal: true,
+hasFloatingBar: false
+},
+{
+id: 'fuladhoo',
+name: 'Fulhadhoo',
+atoll: Atoll.Baa,
+description: 'This island is home to one of the most beautiful beaches in the Maldives, often named among the world’s best. The island is quiet, peaceful, and wrapped in a large tropical forest that feels completely untouched. An attached sandbank stretches off one end, perfect for photos or relaxing in shallow water. There’s no direct ferry from Malé, but you can reach it by a 2-hour speedboat or take a domestic flight to Dharavandhoo and transfer by boat. It’s also a great jumping-off point for seasonal Manta and Whale Shark snorkeling. A favorite for nature lovers who want soft sand, calm waters, and minimal crowds.',
+imageUrl: 'https://cdn.shopify.com/s/files/1/0942/5666/0784/files/Fulhadhoo.webp?v=1763838453',
+videoUrl: 'https://youtu.be/FaUbGMyDZXA',
+dimensions: '1.9km x 270m',
+guestHouseCount: 14,
+transferTypes: [TransferType.Speedboat1To2H, TransferType.DomesticFlightSpeedboat],
+ferryAccess: FerryAccess.None,
+size: IslandSize.Large,
+atmosphere: [Atmosphere.Quiet, Atmosphere.Local],
+accommodations: [Accommodation.AffordableLuxury, Accommodation.Pool],
+bikiniBeach: BikiniBeach.Large,
+watersports: Watersports.Minimal,
+marineActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks, MarineActivity.Dolphins, MarineActivity.HouseReef],
+seasonalActivities: [MarineActivity.MantaRays, MarineActivity.WhaleSharks],
+jungle: JungleVegetation.Large,
+nightlife: Nightlife.Minimal,
+hasSandbankAttached: true,
+isSandbankSeasonal: false,
+hasFloatingBar: false
 }
-
-export const AIConsultant: React.FC<AIConsultantProps> = ({ onSearch, isLoading, onClear, hasResults, resetSignal }) => {
-  const [input, setInput] = useState('');
-
-  // Listen for external global reset signal
-  useEffect(() => {
-    if (resetSignal > 0) {
-      setInput('');
-    }
-  }, [resetSignal]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (input.trim()) {
-      onSearch(input);
-    }
-  };
-
-  const handleClearInput = () => {
-    setInput('');
-    // If we have active results, clearing the input should also clear the AI filter
-    if (hasResults) {
-        onClear();
-    }
-  };
-
-  return (
-    <div className="bg-gradient-to-br from-teal-800 to-teal-900 rounded-2xl p-6 md:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
-      {/* Decorative circles */}
-      <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-teal-500 opacity-20 blur-3xl"></div>
-      <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-emerald-500 opacity-20 blur-3xl"></div>
-
-      <div className="relative z-10 max-w-3xl mx-auto text-center">
-        <h2 className="text-2xl md:text-3xl font-serif font-medium mb-3">
-          Not sure which island to pick?
-        </h2>
-        <p className="text-teal-100 mb-6 text-sm md:text-base">
-          Describe your dream trip (e.g., "I want to see sharks but stay on a quiet island with lots of trees") and we'll give island suggestions.
-        </p>
-        
-        <form onSubmit={handleSubmit} className="relative max-w-xl mx-auto">
-          <div className="relative group">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Describe your ideal Maldives vacation..."
-              className="w-full py-4 pl-6 pr-[150px] rounded-full bg-white text-gray-800 focus:outline-none focus:ring-4 focus:ring-teal-500/50 shadow-lg placeholder:text-gray-400"
-            />
-            
-            <div className="absolute right-2 top-2 bottom-2 flex items-center gap-2">
-                {/* Clear X Button - Visible when there is text or results */}
-                {(input.length > 0 || hasResults) && (
-                    <button
-                        type="button"
-                        onClick={handleClearInput}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-                        title="Clear search"
-                    >
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                )}
-
-                <button 
-                type="submit"
-                disabled={isLoading || !input.trim()}
-                className="h-full px-5 rounded-full bg-teal-600 hover:bg-teal-500 text-white font-medium transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
-                >
-                {isLoading ? (
-                    <>
-                    <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-                    Thinking...
-                    </>
-                ) : (
-                    <>
-                    <span>Find an island</span>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                    </>
-                )}
-                </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
+];]]></content>
