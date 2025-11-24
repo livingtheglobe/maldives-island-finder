@@ -43,6 +43,7 @@ const App: React.FC = () => {
   const [filters, setFilters] = useState<FilterState>(INITIAL_FILTERS);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiRecommendations, setAiRecommendations] = useState<AIRecommendation[]>([]);
+  const [searchError, setSearchError] = useState<string | null>(null);
   const [resetSignal, setResetSignal] = useState(0);
   
   // State for Mobile Filter Toggle (Twist/Twirl)
@@ -70,13 +71,28 @@ const App: React.FC = () => {
 
   const handleAISearch = async (prompt: string) => {
     setAiLoading(true);
-    const recommendations = await getIslandRecommendations(prompt);
-    setAiRecommendations(recommendations);
-    setAiLoading(false);
+    setSearchError(null); // Clear previous errors
+    
+    try {
+      const recommendations = await getIslandRecommendations(prompt);
+      
+      if (recommendations.length === 0) {
+        setSearchError("We could not find an island. Repeat query.");
+        setAiRecommendations([]);
+      } else {
+        setAiRecommendations(recommendations);
+      }
+    } catch (error) {
+      setSearchError("An error occurred. Please try again.");
+      setAiRecommendations([]);
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const handleClearAI = () => {
     setAiRecommendations([]);
+    setSearchError(null);
   };
 
   const handleGlobalReset = () => {
@@ -227,7 +243,8 @@ const App: React.FC = () => {
   // Helper to render checkboxes conditionally (Hide if not available)
   const renderFilterGroup = (
       options: string[], 
-      category: keyof FilterState
+      category: keyof FilterState, 
+      labelFn: (val: string) => string = (v) => v
   ) => {
       return options.map(opt => {
           // If option is not available AND not currently checked, hide it.
@@ -241,10 +258,10 @@ const App: React.FC = () => {
           return (
             <FilterCheckbox 
                 key={opt} 
-                label={opt} 
+                label={labelFn(opt)} 
                 value={opt} 
                 checked={isChecked} 
-                onChange={(val, c) => handleArrayFilterChange(category, val, c)}
+                onChange={(v, c) => handleArrayFilterChange(category, v, c)}
             />
           );
       });
@@ -254,15 +271,31 @@ const App: React.FC = () => {
     <div className="min-h-screen font-sans text-gray-800 pb-20 bg-stone-50">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <AIConsultant 
-          onSearch={handleAISearch} 
-          isLoading={aiLoading}
-          onClear={handleClearAI}
-          hasResults={aiRecommendations.length > 0}
-          resetSignal={resetSignal}
-        />
+        <div className="relative">
+          <AIConsultant 
+            onSearch={handleAISearch} 
+            isLoading={aiLoading}
+            onClear={handleClearAI}
+            hasResults={aiRecommendations.length > 0}
+            resetSignal={resetSignal}
+          />
+          
+          {/* Error Message Display */}
+          {searchError && (
+            <div className="absolute bottom-0 left-0 right-0 transform translate-y-4 text-center z-10 animate-fade-in">
+              <div className="inline-block bg-red-50 text-red-600 px-6 py-3 rounded-full shadow-md border border-red-100 text-sm font-medium">
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {searchError}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-8 mt-8">
           {/* Sidebar Filters */}
           <aside className="w-full lg:w-80 flex-shrink-0">
             <div className="bg-white rounded-xl shadow-sm border border-stone-200 sticky top-24 max-h-[85vh] overflow-y-auto scrollbar-thin flex flex-col">
